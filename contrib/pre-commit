@@ -17,7 +17,7 @@ then
 fi
 
 echo "Running Unit Tests..."
-./vendor/bin/phpunit
+phpdbg -qrr ./vendor/bin/phpunit --configuration unit-config/phpunit-unit-cover.xml -d memory_limit=1024M
 if [ $? != 0 ]
 then
     echo "Fix the Unit Tests errors before commit."

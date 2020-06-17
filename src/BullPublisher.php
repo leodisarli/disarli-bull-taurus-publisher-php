@@ -2,7 +2,7 @@
 
 namespace BullPublisher;
 
-use Ramsey\Uuid\Uuid;
+use Ulid\Ulid;
 use Predis\Client;
 
 class BullPublisher
@@ -28,25 +28,29 @@ class BullPublisher
 
     public function add($queue, $name, $data = [], $opts = [])
     {
-        $uuid = $this->newUuid();
-        $this->token = $uuid->toString();
+        $ulid = $this->newUlid();
+        $this->token = $ulid->generate();
 
         $this->keyPrefix = sprintf('%s:%s:', $this->prefix, $queue);
-        
-        if (!is_string($name)) {
-            $opts = $data;
-            $data = $name;
-            $name = '__default__';
+
+        if (empty($name)) {
+            $name = 'process';
         }
         $opts = (is_array($opts) ? $opts : [$opts]);
 
-        $timestamp = intval(str_replace('.', '', microtime(true)));
+        $attempts = (isset($opts['attempts']) ? intval($opts['attempts']) : 3);
+        $backoff = (isset($opts['backoff']) ? intval($opts['backoff']) : 30000);
         $delay = (isset($opts['delay']) ? intval($opts['delay']) : 0);
+        $removeOnComplete = (isset($opts['removeOnComplete']) ? intval($opts['removeOnComplete']) : 100);
+        $timestamp = intval(str_replace('.', '', microtime(true)));
+        $jobId = (isset($opts['jobId']) ? $opts['jobId'] : $ulid->generate());
 
         $defaults = [
-            'attempts'  => 1,
+            'attempts' => $attempts,
+            'backoff' => $backoff,
+            'delay' => $delay,
+            'removeOnComplete' => $removeOnComplete,
             'timestamp' => $timestamp,
-            'delay'     => $delay,
         ];
         $options = array_merge_recursive($defaults, $opts);
         $redis = $this->newClient();
@@ -59,7 +63,7 @@ class BullPublisher
             $this->keyPrefix . 'delayed',
             $this->keyPrefix . 'priority',
             $this->keyPrefix,
-            (isset($opts['customJobId']) ? $opts['customJobId'] : ''),
+            $jobId,
             $name,
             json_encode($data),
             json_encode($options),
@@ -75,16 +79,16 @@ class BullPublisher
     /**
      * @codeCoverageIgnore
      * create uuid instance
-     * @return \Ramsey\Uuid\Uuid
+     * @return \Ramsey\Ulid\Ulid
      */
-    public function newUuid()
+    public function newUlid()
     {
-        return Uuid::uuid4();
+        return new Ulid();
     }
 
     /**
      * @codeCoverageIgnore
-     * create uuid instance
+     * create predis client instance
      * @return \Predis\Client
      */
     public function newClient()

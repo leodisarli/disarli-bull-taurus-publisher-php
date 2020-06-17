@@ -2,7 +2,7 @@
 
 namespace BullPublisher;
 
-use Ramsey\Uuid\Uuid;
+use Ramsey\Ulid\Ulid;
 use Predis\Client;
 use Mockery;
 use PHPUnit\Framework\TestCase;

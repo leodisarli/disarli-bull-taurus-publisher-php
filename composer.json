@@ -5,9 +5,9 @@
     "type": "library",
     "license": "GPL-3.0-only",
     "require": {
-        "php" : "^7.1",
+        "php": "^7.1",
         "predis/predis": "~1.1.0",
-        "ramsey/uuid": "^4.0.0"
+        "leodisarli/disarli-ulid-php": "^1.0.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^7.5",
@@ -29,18 +29,18 @@
         "post-install-cmd": [
             "bash contrib/setup.sh"
         ],
-        "check" : [
+        "check": [
             "@lint",
             "@cs",
             "@test-cover",
             "@cc"
         ],
-        "lint" : [
+        "lint": [
             "find ./src -name '*.php' -print0 | xargs -0 -n1 -P8 php -l -d display_errors=0"
         ],
-        "cs" : "vendor/bin/phpcs",
-        "test" : "phpdbg -qrr vendor/bin/phpunit --configuration unit-config/phpunit-unit.xml -d memory_limit=1024M",
-        "test-cover" : "phpdbg -qrr vendor/bin/phpunit --configuration unit-config/phpunit-unit-cover.xml -d memory_limit=1024M",
-        "cc" : "php contrib/coverage-checker.php coverage/coverage.xml 100"
+        "cs": "vendor/bin/phpcs",
+        "test": "phpdbg -qrr vendor/bin/phpunit --configuration unit-config/phpunit-unit.xml -d memory_limit=1024M",
+        "test-cover": "phpdbg -qrr vendor/bin/phpunit --configuration unit-config/phpunit-unit-cover.xml -d memory_limit=1024M",
+        "cc": "php contrib/coverage-checker.php coverage/coverage.xml 100"
     }
 }

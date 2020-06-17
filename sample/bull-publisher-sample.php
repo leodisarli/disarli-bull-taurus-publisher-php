@@ -12,7 +12,7 @@ $bull = new BullPublisher(
 );
 
 $queue = 'test-queue';
-$job = 'single';
+$job = 'process';
 $data = [
     'foo' => 'php',
 ];
